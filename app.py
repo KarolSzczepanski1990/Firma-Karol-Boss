@@ -928,4 +928,70 @@ elif menu == "📦 Magazyn":
 
         st.dataframe(
             pd.DataFrame(
-     
+                st.session_state.magazyn
+            ),
+            use_container_width=True,
+            hide_index=True
+        )
+    else:
+        st.info("Magazyn jest pusty.")
+
+elif menu == "🚚 Transport":
+    st.header("🚚 Centrum transportu")
+    with st.form("transport_form"):
+        pojazd = st.text_input("Nazwa pojazdu")
+        rejestracja = st.text_input("Numer rejestracyjny")
+        dodaj = st.form_submit_button("➕ Dodaj pojazd")
+    if dodaj:
+        if pojazd.strip():
+            st.session_state.pojazdy.append({"pojazd": pojazd.strip(), "rejestracja": rejestracja.strip()})
+            historia(f"Dodano pojazd: {pojazd}")
+            st.rerun()
+        else:
+            st.error("Podaj nazwę pojazdu.")
+    if st.session_state.pojazdy:
+        st.dataframe(pd.DataFrame(st.session_state.pojazdy), hide_index=True, use_container_width=True)
+    else:
+        st.info("Brak pojazdów w systemie.")
+
+elif menu == "🤖 Centrum AI":
+    st.header("🤖 FirmaPRO Intelligence")
+    st.caption("Asystent demonstracyjny — bez połączenia z modelem AI.")
+    st.info("Zapytaj o pracowników, urlopy, finanse, zadania lub magazyn.")
+    for wiadomosc in st.session_state.chat:
+        with st.chat_message(wiadomosc["rola"]):
+            st.write(wiadomosc["tekst"])
+    pytanie = st.chat_input("Zapytaj FirmaPRO...")
+    if pytanie:
+        st.session_state.chat.append({"rola": "user", "tekst": pytanie})
+        tekst = pytanie.lower()
+        if "urlop" in tekst:
+            odpowiedz = f"Pozostało łącznie {sum(p['urlop'] for p in pracownicy.values())} dni urlopu."
+        elif "pracownik" in tekst:
+            odpowiedz = f"W firmie pracuje {len(pracownicy)} osób."
+        elif any(x in tekst for x in ["finans", "przych", "koszt", "zarob", "bilans"]):
+            przychody, koszty, bilans = podsumowanie_finansow()
+            odpowiedz = f"Przychody: {pieniadze(przychody)}. Wydatki: {pieniadze(koszty)}. Bilans: {pieniadze(bilans)}."
+        elif "zadani" in tekst:
+            odpowiedz = f"Liczba zadań: {len(st.session_state.zadania)}."
+        elif "magazyn" in tekst:
+            odpowiedz = f"Liczba pozycji magazynowych: {len(st.session_state.magazyn)}."
+        else:
+            odpowiedz = "To wersja demonstracyjna. Zapytaj o pracowników, urlopy, finanse, zadania lub magazyn."
+        st.session_state.chat.append({"rola": "assistant", "tekst": odpowiedz})
+        st.rerun()
+
+elif menu == "📋 Historia":
+    st.header("📋 Historia systemu")
+    if st.session_state.historia:
+        for wpis in reversed(st.session_state.historia):
+            st.write("📌", wpis)
+    else:
+        st.info("Nie wykonano jeszcze żadnych operacji.")
+
+st.divider()
+st.markdown("""
+<div style="text-align:center;color:#8196B2;font-size:12px;padding:15px">
+🚀 FirmaPRO ULTRA AI 3.0<br>FUTURE BUSINESS OPERATING SYSTEM<br>
+<span style="color:#F5C86A">PREMIUM DEMO EDITION</span></div>
+""", unsafe_allow_html=True)
