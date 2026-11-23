@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 import html
 
 # ==========================================
-# FIRMAPRO ULTRA AI 3.0
+# FIRMAPRO ULTRA AI 4.0
 # ==========================================
 
 st.set_page_config(
@@ -189,6 +189,42 @@ div[data-baseweb="select"] > div {
 hr {
     border-color: #263B55;
 }
+
+/* PREMIUM MOBILE */
+.stApp { color-scheme: dark; }
+.stApp [data-testid="stWidgetLabel"] p, .stApp label, .stApp [data-testid="stMarkdownContainer"] p { color: #eaf2ff; }
+.stApp [data-testid="stCaptionContainer"] p { color: #b9cce3; }
+.stApp input, .stApp textarea { color: #f5f8ff !important; background: #15263e !important; -webkit-text-fill-color: #f5f8ff; }
+.stApp input::placeholder, .stApp textarea::placeholder { -webkit-text-fill-color: #a8bdd5; }
+.stApp [data-baseweb="input"], .stApp [data-baseweb="base-input"], .stApp [data-baseweb="select"] > div, .stApp [data-baseweb="textarea"] { background: #15263e !important; color: #f5f8ff !important; border-color: #476483 !important; }
+.stApp [data-baseweb="select"] svg, .stApp [data-testid="stNumberInput"] button { color: #eaf2ff !important; background: #15263e; }
+[data-baseweb="popover"] [role="listbox"], [data-baseweb="popover"] [role="option"] { background: #15263e !important; color: #f5f8ff !important; }
+[data-baseweb="popover"] [role="option"]:hover { background: #29496b !important; }
+.stApp [data-testid="stExpander"] details { border-color: #476483; }
+.stApp [data-testid="stExpander"] summary { color: #eaf2ff; }
+.stApp [data-testid="stMetricLabel"] p { color: #dce8fa; }
+.stApp [data-testid="stChatMessage"] { background: #14243a; color: #eaf2ff; }
+.stApp [data-testid="stButton"] button { transition: box-shadow .2s, transform .2s; }
+.stApp [data-testid="stButton"] button:hover { box-shadow: 0 0 16px #368cf855; }
+.stApp [data-testid="stButton"] button:active { transform: scale(.98); }
+.st-key-nav button { background: #14243a !important; border: 1px solid #476483 !important; min-height: 46px; font-size: .85rem; }
+.st-key-nav button[kind="primary"] { background: #176b80 !important; border-color: #5de1e6 !important; }
+.st-key-nav [data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: .4rem; }
+.st-key-nav [data-testid="stColumn"] { min-width: 0 !important; flex: 1 1 0 !important; width: 0 !important; }
+.st-key-nav button p { font-size: .8rem; overflow-wrap: anywhere; }
+.st-key-nav button { padding: .35rem !important; }
+.st-key-statgrid [data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: .6rem; }
+.st-key-statgrid [data-testid="stColumn"] { min-width: 0 !important; flex: 1 1 0 !important; width: 0 !important; }
+.st-key-statgrid .card { padding: 12px; min-height: 110px; }
+.st-key-statgrid .card-number { font-size: clamp(17px, 4vw, 29px); overflow-wrap: anywhere; }
+.st-key-statgrid .card-label { font-size: 10px; }
+.stApp [class*="st-key-usun_"] button { background: #8f263d !important; border-color: #f07889 !important; }
+.stApp [data-testid="stFormSubmitButton"] button { background: #146b56; border-color: #40b99b; }
+.hero { padding: 16px; margin-bottom: 8px; }
+.logo { font-size: clamp(22px, 5vw, 32px); }
+.block-container { padding-top: 2.8rem; }
+@media(max-width: 600px) { h1 { font-size: 1.7rem !important; } h2 { font-size: 1.4rem !important; } h3 { font-size: 1.1rem !important; } .block-container { padding-left: .85rem; padding-right: .85rem; } }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -379,10 +415,18 @@ opcje = [
     "📋 Historia"
 ]
 
-menu = st.selectbox(
-    "🧭 Centrum nawigacji",
-    opcje
-)
+if "nav_page" not in st.session_state or st.session_state.nav_page not in opcje:
+    st.session_state.nav_page = opcje[0]
+with st.container(key="nav"):
+    for start in range(0, len(opcje), 3):
+        cols = st.columns(3)
+        for col, opcja in zip(cols, opcje[start:start+3]):
+            with col:
+                if st.button(opcja, key="nav_" + opcja, use_container_width=True,
+                             type="primary" if st.session_state.nav_page == opcja else "secondary"):
+                    st.session_state.nav_page = opcja
+                    st.rerun()
+menu = st.session_state.nav_page
 
 pracownicy = st.session_state.pracownicy
 
@@ -406,37 +450,14 @@ if menu == "🏠 Dashboard":
         for p in pracownicy.values()
     )
 
-    c1, c2 = st.columns(2)
-
-    with c1:
-        karta(
-            "👥",
-            "PRACOWNICY",
-            liczba,
-            "Aktywny zespół"
-        )
-
-        karta(
-            "💰",
-            "PRZYCHODY",
-            pieniadze(przychody),
-            "Zarejestrowane wpływy"
-        )
-
-    with c2:
-        karta(
-            "🏖️",
-            "DNI URLOPU",
-            pozostalo,
-            "Pozostałe dni"
-        )
-
-        karta(
-            "📊",
-            "BILANS",
-            pieniadze(bilans),
-            "Przychody minus wydatki"
-        )
+    with st.container(key="statgrid"):
+        c1, c2 = st.columns(2)
+        with c1:
+            karta("👥", "PRACOWNICY", liczba, "Aktywny zespół")
+            karta("💰", "PRZYCHODY", pieniadze(przychody), "Wpływy")
+        with c2:
+            karta("🏖️", "DNI URLOPU", pozostalo, "Pozostałe dni")
+            karta("📊", "BILANS", pieniadze(bilans), "Wpływy minus wydatki")
 
     st.subheader("📈 Analiza zespołu")
 
@@ -992,6 +1013,6 @@ elif menu == "📋 Historia":
 st.divider()
 st.markdown("""
 <div style="text-align:center;color:#8196B2;font-size:12px;padding:15px">
-🚀 FirmaPRO ULTRA AI 3.0<br>FUTURE BUSINESS OPERATING SYSTEM<br>
-<span style="color:#F5C86A">PREMIUM DEMO EDITION</span></div>
+🚀 FirmaPRO ULTRA AI 4.0<br>FUTURE BUSINESS OPERATING SYSTEM<br>
+<span style="color:#F5C86A">PREMIUM MOBILE • DEMO</span></div>
 """, unsafe_allow_html=True)
