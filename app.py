@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 import html
 
 # ==========================================
-# FIRMAPRO ULTRA AI 4.0
+# FIRMAPRO ULTRA AI 5.0
 # ==========================================
 
 st.set_page_config(
@@ -225,6 +225,22 @@ hr {
 .block-container { padding-top: 2.8rem; }
 @media(max-width: 600px) { h1 { font-size: 1.7rem !important; } h2 { font-size: 1.4rem !important; } h3 { font-size: 1.1rem !important; } .block-container { padding-left: .85rem; padding-right: .85rem; } }
 
+
+.block-container{max-width:850px;padding-top:3rem;padding-bottom:7rem}
+.stApp{background:radial-gradient(ellipse at 90% 0%,#102e42,transparent 42%),#050b13}
+.hero{background:linear-gradient(125deg,#102c40aa,#09131e);border:1px solid #31546b;border-radius:24px;padding:18px;box-shadow:inset 0 1px 1px #ffffff22,0 12px 32px #0006}
+.logo{font-size:28px;letter-spacing:-1px}.subtitle{letter-spacing:2px;font-size:10px}
+.card{background:linear-gradient(145deg,#183b50aa,#0b1725);border:1px solid #42677c;border-radius:18px;box-shadow:inset 0 1px 2px #ffffff30,0 5px 20px #00cfff12;position:relative;overflow:hidden}
+.card svg{display:block;width:25px;height:25px;margin-bottom:7px;color:#54d9ff;filter:drop-shadow(0 0 6px #37bfff88)}
+.card-number{letter-spacing:-.7px}.card-footer{color:#8cebdc}
+.st-key-nav button{min-height:82px!important;background:linear-gradient(145deg,#18384b,#0b1725)!important;border-radius:18px!important;box-shadow:inset 0 1px 1px #ffffff35,0 4px 12px #00bfff15!important;flex-direction:column;gap:6px!important}
+.st-key-nav button span[data-testid="stIconMaterial"]{font-size:29px!important;color:#68d9ff!important}
+.st-key-nav button[kind="primary"]{background:linear-gradient(145deg,#14556b,#102637)!important;box-shadow:0 0 16px #00cfff44!important}
+.st-key-bottomnav{position:sticky;bottom:0;z-index:90;background:#091522ed;border:1px solid #35556a;border-radius:22px;padding:8px;backdrop-filter:blur(18px)}
+.st-key-bottomnav [data-testid="stHorizontalBlock"]{flex-wrap:nowrap!important;gap:4px}.st-key-bottomnav [data-testid="stColumn"]{min-width:0!important;flex:1 1 0!important;width:0!important}
+.st-key-bottomnav button{background:#122638!important;border:0!important;padding:4px!important;min-height:48px;flex-direction:column}.st-key-bottomnav button p{font-size:10px!important}
+.st-key-bottomnav button span[data-testid="stIconMaterial"]{color:#5de1e6;font-size:24px}
+.progressring{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;margin:12px auto;background:conic-gradient(#00e5cf var(--progress),#26394b 0)}.progressring b{display:grid;place-items:center;width:70px;height:70px;background:#0c1927;border-radius:50%;color:white;font-size:20px}
 </style>
 """, unsafe_allow_html=True)
 
@@ -292,10 +308,12 @@ def historia(opis):
     )
 
 def karta(ikona, nazwa, wartosc, opis):
+    paths = {"👥": '<circle cx="9" cy="7" r="3"/><path d="M3 20v-3a6 6 0 0 1 12 0v3M16 4a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 5v2"/>', "🏖️": '<path d="M2 12a10 10 0 0 1 20 0H2m10 0v9m-5 0h10"/>', "💰": '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0"/>', "📊": '<path d="M4 20V12h4v8m2 0V7h4v13m2 0V3h4v17"/>'}
+    svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+paths.get(ikona,paths["📊"])+'</svg>'
     st.markdown(f"""
     <div class="card">
         <div class="card-label">
-            {ikona} {html.escape(str(nazwa))}
+            {svg} {html.escape(str(nazwa))}
         </div>
         <div class="card-number">
             {html.escape(str(wartosc))}
@@ -337,8 +355,7 @@ def nazwa_pracownika(ident):
 st.markdown("""
 <div class="hero">
     <div class="logo">
-        🚀 Firma<span class="gold">PRO</span>
-        <span class="neon"> ULTRA</span>
+        <span style="color:#55d9ff">▥</span> Firma<span class="neon">PRO</span> <span style="font-size:14px;color:#8ddfff">ULTRA 5.0</span>
     </div>
     <div class="subtitle">
         AI BUSINESS OPERATING SYSTEM
@@ -412,21 +429,25 @@ opcje = [
     "📦 Magazyn",
     "🚚 Transport",
     "🤖 Centrum AI",
-    "📋 Historia"
+    "📋 Historia",
+    "📊 Raporty"
 ]
 
 if "nav_page" not in st.session_state or st.session_state.nav_page not in opcje:
     st.session_state.nav_page = opcje[0]
-with st.container(key="nav"):
-    for start in range(0, len(opcje), 3):
-        cols = st.columns(3)
-        for col, opcja in zip(cols, opcje[start:start+3]):
-            with col:
-                if st.button(opcja, key="nav_" + opcja, use_container_width=True,
-                             type="primary" if st.session_state.nav_page == opcja else "secondary"):
-                    st.session_state.nav_page = opcja
-                    st.rerun()
+ikony = dict(zip(opcje, [":material/home:", ":material/groups:", ":material/beach_access:", ":material/event_available:", ":material/payments:", ":material/inventory_2:", ":material/local_shipping:", ":material/memory:", ":material/history:", ":material/monitoring:"]))
 menu = st.session_state.nav_page
+
+if menu != opcje[0]:
+    with st.container(key="nav"):
+        for start in range(0, len(opcje), 3):
+            cols = st.columns(3)
+            for col, opcja in zip(cols, opcje[start:start+3]):
+                with col:
+                    if st.button(opcja.split(" ", 1)[1], icon=ikony[opcja], key="nav_" + opcja, use_container_width=True,
+                                 type="primary" if st.session_state.nav_page == opcja else "secondary"):
+                        st.session_state.nav_page = opcja
+                        st.rerun()
 
 pracownicy = st.session_state.pracownicy
 
@@ -436,7 +457,7 @@ pracownicy = st.session_state.pracownicy
 
 if menu == "🏠 Dashboard":
 
-    st.header("Centrum dowodzenia")
+    st.header("Witaj w FirmaPRO")
     st.caption("FirmaPRO Intelligence Dashboard")
 
     przychody, koszty, bilans = (
@@ -457,55 +478,38 @@ if menu == "🏠 Dashboard":
             karta("💰", "PRZYCHODY", pieniadze(przychody), "Wpływy")
         with c2:
             karta("🏖️", "DNI URLOPU", pozostalo, "Pozostałe dni")
-            karta("📊", "BILANS", pieniadze(bilans), "Wpływy minus wydatki")
+            karta("📊", "WYDATKI", pieniadze(koszty), "Koszty firmy")
 
-    st.subheader("📈 Analiza zespołu")
-
-    if pracownicy:
-        df = pd.DataFrame([
-            {
-                "Pracownik": p["imie"],
-                "Dni urlopu": p["urlop"]
-            }
-            for p in pracownicy.values()
-        ])
-
-        st.bar_chart(
-            df.set_index("Pracownik"),
-            color="#F5C86A"
-        )
-
-    st.subheader("⚡ Szybkie informacje")
-
-    a, b = st.columns(2)
-
-    with a:
-        st.metric(
-            "📅 Zadania",
-            len(st.session_state.zadania)
-        )
-
-    with b:
-        st.metric(
-            "🚚 Pojazdy",
-            len(st.session_state.pojazdy)
-        )
-
-    st.subheader("👥 Twój zespół")
-
-    for p in pracownicy.values():
-        st.markdown(f"""
-        <div class="employee">
-            👤 <b>{html.escape(p['imie'])}</b><br>
-            <span style="
-                color:#9DB3CF;
-                font-size:12px;
-            ">
-                {html.escape(p['stanowisko'])}
-                • {p['urlop']} dni urlopu
-            </span>
-        </div>
-        """, unsafe_allow_html=True)
+    st.subheader("Wynik finansowy")
+    st.metric("Bilans", pieniadze(bilans))
+    if st.session_state.finanse:
+        saldo = 0
+        punkty = [0]
+        for wpis in st.session_state.finanse:
+            saldo += wpis["kwota"] if wpis["typ"] == "Przychód" else -wpis["kwota"]
+            punkty.append(saldo)
+        st.area_chart(pd.DataFrame({"Bilans": punkty}), color="#00d9d0")
+    else:
+        st.caption("Dodaj operacje finansowe, aby zobaczyć wykres.")
+    total = len(st.session_state.zadania)
+    done = sum(z["status"] == "Wykonane" for z in st.session_state.zadania)
+    pct = round(100 * done / total) if total else 0
+    st.markdown(f'<div class="card"><div class="card-label">Wykonanie zadań</div><div class="progressring" style="--progress:{pct}%"><b>{pct}%</b></div><div style="text-align:center;color:#b8d5e8">{done} / {total} zadań</div></div>', unsafe_allow_html=True)
+    st.subheader("Centrum zarządzania")
+    with st.container(key="nav"):
+        for start in range(0, len(opcje), 3):
+            cols = st.columns(3)
+            for col, opcja in zip(cols, opcje[start:start+3]):
+                with col:
+                    if st.button(opcja.split(" ", 1)[1], icon=ikony[opcja], key="nav_" + opcja, use_container_width=True,
+                                 type="primary" if st.session_state.nav_page == opcja else "secondary"):
+                        st.session_state.nav_page = opcja
+                        st.rerun()
+    st.subheader("Szybkie akcje")
+    for label, target, icon in [("Dodaj pracownika",opcje[1],":material/person_add:"),("Dodaj produkt",opcje[5],":material/add_box:"),("Nowe zadanie",opcje[3],":material/add_task:")]:
+        if st.button(label, icon=icon, key="quick_"+label, use_container_width=True):
+            st.session_state.nav_page=target
+            st.rerun()
 
 # ==========================================
 # PRACOWNICY
@@ -1010,9 +1014,20 @@ elif menu == "📋 Historia":
     else:
         st.info("Nie wykonano jeszcze żadnych operacji.")
 
+elif menu == "📊 Raporty":
+    st.header("Raporty")
+    for nazwa, dane in [("Pracownicy",list(pracownicy.values())),("Finanse",st.session_state.finanse),("Zadania",st.session_state.zadania),("Magazyn",st.session_state.magazyn)]:
+        st.download_button("Pobierz: "+nazwa, pd.DataFrame(dane).to_csv(index=False).encode("utf-8-sig"), file_name=nazwa+".csv", mime="text/csv")
+
+with st.container(key="bottomnav"):
+    for col, (label, target, icon) in zip(st.columns(5), [("Start",opcje[0],":material/home:"),("Zespół",opcje[1],":material/groups:"),("Dodaj",opcje[3],":material/add_circle:"),("Finanse",opcje[4],":material/payments:"),("Zadania",opcje[3],":material/event:")]):
+        with col:
+            if st.button(label, icon=icon, key="bottom_"+label, use_container_width=True):
+                st.session_state.nav_page=target
+                st.rerun()
 st.divider()
 st.markdown("""
 <div style="text-align:center;color:#8196B2;font-size:12px;padding:15px">
-🚀 FirmaPRO ULTRA AI 4.0<br>FUTURE BUSINESS OPERATING SYSTEM<br>
+🚀 FirmaPRO ULTRA AI 5.0<br>FUTURE BUSINESS OPERATING SYSTEM<br>
 <span style="color:#F5C86A">PREMIUM MOBILE • DEMO</span></div>
 """, unsafe_allow_html=True)
